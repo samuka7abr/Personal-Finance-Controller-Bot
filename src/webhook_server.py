@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 from flask import Flask, request
 from telegram import Update
 from .bot import create_application
@@ -40,7 +41,8 @@ def main():
         application = create_application()
         if application:
             try:
-                application.bot.set_webhook(webhook_url)
+                # Executar set_webhook de forma assíncrona
+                asyncio.run(application.bot.set_webhook(webhook_url))
                 logger.info(f"Webhook configurado: {webhook_url}")
             except Exception as e:
                 logger.error(f"Erro ao configurar webhook: {e}")
