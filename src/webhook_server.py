@@ -15,7 +15,7 @@ def index():
     return "Personal Finance Controller Bot is running!"
 
 @app.route('/webhook', methods=['POST'])
-async def webhook():
+def webhook():
     try:
         application = create_application()
         if not application:
@@ -24,7 +24,8 @@ async def webhook():
         json_data = request.get_json()
         if json_data:
             update = Update.de_json(json_data, application.bot)
-            await application.process_update(update)
+            # Executar de forma assíncrona dentro de uma função síncrona
+            asyncio.run(application.process_update(update))
         
         return "OK", 200
     except Exception as e:
