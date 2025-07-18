@@ -1,13 +1,15 @@
 import pytest
 import sys
 import os
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src.bot import PersonalFinanceBotManager
-
 class TestPersonalFinanceBot:
-    def setup_method(self):
+    @patch('src.bot.GoogleSheetsManager')
+    def setup_method(self, mock_sheets):
+        mock_sheets.return_value = Mock()
+        from src.bot import PersonalFinanceBotManager
         self.bot_manager = PersonalFinanceBotManager()
     
     def test_parse_expense_valid(self):

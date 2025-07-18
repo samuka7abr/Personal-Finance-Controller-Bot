@@ -5,16 +5,14 @@ from unittest.mock import Mock, AsyncMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src.bot import PersonalFinanceBotManager
-
 class TestBotSimulation:
-    def setup_method(self):
+    @patch('src.bot.GoogleSheetsManager')
+    def setup_method(self, mock_sheets):
+        mock_sheets.return_value = Mock()
+        from src.bot import PersonalFinanceBotManager
         self.bot_manager = PersonalFinanceBotManager()
     
-    @patch('src.bot.bot_manager.sheets_manager.add_expense')
-    def test_expense_message_simulation(self, mock_add_expense):
-        mock_add_expense.return_value = True
-        
+    def test_expense_message_simulation(self):
         test_messages = [
             "100.50 - Cartão Visa - Alimentação (supermercado)",
             "50,00 - Dinheiro - Transporte (uber)",
@@ -27,14 +25,8 @@ class TestBotSimulation:
             result = self.bot_manager.parse_transaction(message)
             assert result is not None
             assert result['tipo'] == 'despesa'
-            
-            success = mock_add_expense.return_value
-            assert success == True
     
-    @patch('src.bot.bot_manager.sheets_manager.add_credit')
-    def test_credit_message_simulation(self, mock_add_credit):
-        mock_add_credit.return_value = True
-        
+    def test_credit_message_simulation(self):
         test_messages = [
             "1500.00 - credito",
             "2000,50 - credito", 
@@ -46,14 +38,8 @@ class TestBotSimulation:
             result = self.bot_manager.parse_transaction(message)
             assert result is not None
             assert result['tipo'] == 'credito'
-            
-            success = mock_add_credit.return_value
-            assert success == True
     
-    @patch('src.bot.bot_manager.sheets_manager.add_investment')
-    def test_investment_message_simulation(self, mock_add_investment):
-        mock_add_investment.return_value = True
-        
+    def test_investment_message_simulation(self):
         test_messages = [
             "500.00 - investimento - Renda Fixa",
             "1000,00 - investimento - Ações",
@@ -66,9 +52,6 @@ class TestBotSimulation:
             result = self.bot_manager.parse_transaction(message)
             assert result is not None
             assert result['tipo'] == 'investimento'
-            
-            success = mock_add_investment.return_value
-            assert success == True
     
     def test_mixed_transaction_simulation(self):
         messages_and_expected = [
@@ -139,20 +122,20 @@ class TestBotSimulation:
     
     def test_category_variations_simulation(self):
         categories = [
-            ("100 - Cartão - Alimentação (supermercado)", "alimentacao"),
-            ("100 - Cartão - Transporte (uber)", "transporte"),
-            ("100 - Cartão - Saúde (farmácia)", "saude"),
-            ("100 - Cartão - Lazer (cinema)", "lazer"),
-            ("100 - Cartão - Educação (curso)", "educacao"),
-            ("100 - Cartão - Casa (material de limpeza)", "casa"),
-            ("100 - Cartão - Vestuário (roupa)", "vestuario")
+            ("100 - Cartão - Alimentação (supermercado)", "Alimentação"),
+            ("100 - Cartão - Transporte (uber)", "Transporte"),
+            ("100 - Cartão - Saúde (farmácia)", "Saúde"),
+            ("100 - Cartão - Lazer (cinema)", "Lazer"),
+            ("100 - Cartão - Educação (curso)", "Educação"),
+            ("100 - Cartão - Casa (material de limpeza)", "Casa"),
+            ("100 - Cartão - Vestuário (roupa)", "Vestuário")
         ]
         
         for message, expected_category in categories:
             result = self.bot_manager.parse_transaction(message)
             assert result is not None
             assert result['tipo'] == 'despesa'
-            assert result['categoria'] == expected_category.title()
+            assert result['categoria'] == expected_category
     
     def test_payment_type_variations_simulation(self):
         payment_types = [

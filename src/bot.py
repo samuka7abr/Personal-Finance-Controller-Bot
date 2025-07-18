@@ -96,7 +96,8 @@ class PersonalFinanceBotManager:
         
         return None
 
-bot_manager = PersonalFinanceBotManager()
+# Remover esta linha que está causando problema nos testes
+# bot_manager = PersonalFinanceBotManager()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_message = """
@@ -154,6 +155,7 @@ Vamos começar a controlar suas finanças pessoais! 💰
 
 async def clear_table(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        bot_manager = PersonalFinanceBotManager()
         success = bot_manager.sheets_manager.clear_table()
         
         if success:
@@ -171,6 +173,7 @@ async def statistics(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await update.message.reply_text("📊 Gerando estatísticas... Por favor, aguarde.")
         
+        bot_manager = PersonalFinanceBotManager()
         data = bot_manager.sheets_manager.get_all_data()
         
         if not data:
@@ -214,6 +217,7 @@ async def handle_transaction(update: Update, context: ContextTypes.DEFAULT_TYPE)
     try:
         message_text = update.message.text
         
+        bot_manager = PersonalFinanceBotManager()
         transaction_data = bot_manager.parse_transaction(message_text)
         
         if not transaction_data:
